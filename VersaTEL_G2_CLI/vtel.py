@@ -28,6 +28,8 @@ class CLI():
             self.judge()
         elif self.args.vtel_sub == 'iscsi':
             self.iscsi_judge()
+        else:
+            self.vtel.print_help()
 
     def parser_vtel(self):
         self.vtel = argparse.ArgumentParser(prog='vtel')
@@ -702,8 +704,6 @@ class CLI():
 
         else:
             self.vtel.print_help()
-
-
 
     """
     ------iscsi-------
