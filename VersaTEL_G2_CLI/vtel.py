@@ -25,7 +25,7 @@ class CLI():
         self.parser_iscsi()
         self.args = self.vtel.parse_args()
         if self.args.vtel_sub == 'stor':
-            self.judge()
+            self.stor_judge()
         elif self.args.vtel_sub == 'iscsi':
             self.iscsi_judge()
         else:
@@ -261,7 +261,7 @@ class CLI():
 
         def node_create():
             if args.gui:
-                handle = SocketSend
+                handle = SocketSend()
                 handle.send_result(stor_action.create_node,args.node, args.ip, args.nodetype)
             elif args.node and args.nodetype and args.ip:
                 stor_action.create_node(args.node, args.ip, args.nodetype)
@@ -359,7 +359,7 @@ class CLI():
                 if all(list_auto_required) and not any(list_manual_required):
                     #For GUI
                     if args.gui:
-                        handle = SocketSend
+                        handle = SocketSend()
                         handle.send_result(stor_action.create_res_auto,args.resource, args.size, args.num)
                         return True
                     #CLI
@@ -375,7 +375,7 @@ class CLI():
                     else:
                         #For GUI
                         if args.gui:
-                            handle = SocketSend
+                            handle = SocketSend()
                             handle.send_result(stor_action.create_res_manual,args.resource,args.size,args.node,args.storagepool)
                             return True
                         #CLI
@@ -390,7 +390,7 @@ class CLI():
                     return
                 if not any(list_diskless_forbid):
                     if args.gui:
-                        handle = SocketSend
+                        handle = SocketSend()
                         handle.send_result(stor_action.create_res_diskless,args.node, args.resource)
                         return True
                     else:
@@ -408,7 +408,7 @@ class CLI():
                 if all(list_auto_required) and not any(list_manual_required):
                     #For GUI
                     if args.gui:
-                        handle = SocketSend
+                        handle = SocketSend()
                         handle.send_result(stor_action.add_mirror_auto,args.resource,args.num)
                         return True
                     else:
@@ -423,7 +423,7 @@ class CLI():
                     else:
                         #For GUI
                         if args.gui:
-                            handle = SocketSend
+                            handle = SocketSend()
                             handle.send_result(stor_action.add_mirror_manual,args.resource,args.node,args.storagepool)
                             return True
                         else:
@@ -577,13 +577,13 @@ class CLI():
             if args.storagepool and args.node:
                 if args.lvm:
                     if args.gui:
-                        handle = SocketSend
+                        handle = SocketSend()
                         handle.send_result(stor_action.create_storagepool_lvm,args.node, args.storagepool, args.lvm)
                     else:
                         stor_action.create_storagepool_lvm(args.node, args.storagepool, args.lvm)
                 elif args.tlv:
                     if args.gui:
-                        handle = SocketSend
+                        handle = SocketSend()
                         handle.send_result(stor_action.create_storagepool_thinlv,args.node, args.storagepool, args.tlv)
                     else:
                         stor_action.create_storagepool_thinlv(args.node, args.storagepool, args.tlv)
@@ -678,10 +678,10 @@ class CLI():
 
     #gui端 get DB
     def getdb(self):
-        mes = cli_socketclient.SocketSend()
+        mes = SocketSend()
         mes.send_result(mes.sql_script)#get sql_scipt
 
-    def judge(self):
+    def stor_judge(self):
         args = self.args
         if args.vtel_sub == 'stor':
             if self.args.stor_sub in ['node','n']:
@@ -698,12 +698,6 @@ class CLI():
             else:
                 self.vtel_stor.print_help()
 
-        elif 'iscsi' in sys.argv:
-            if 'show' in sys.argv:
-                pass
-
-        else:
-            self.vtel.print_help()
 
     """
     ------iscsi-------

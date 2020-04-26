@@ -1,13 +1,20 @@
 #coding:utf-8
 import socketserver,socket,subprocess,datetime
 
-def nowTimes():
-    now_time = datetime.datetime.now()
-    return now_time
+def get_host_ip():
+    try:
+        obj_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        obj_socket.connect(('8.8.8.8', 80))
+        ip = obj_socket.getsockname()[0]
+    except Exception:
+        return '127.0.0.0'
+    finally:
+        obj_socket.close()
+    return ip
 
 host_port = 12144
 # host_ip = "192.168.36.61"
-host_ip = "10.203.1.89"
+host_ip = get_host_ip()
 byteData = b'null'
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
