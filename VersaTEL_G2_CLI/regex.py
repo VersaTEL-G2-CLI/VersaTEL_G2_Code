@@ -2,25 +2,6 @@
 import re
 
 #for diskgroup
-def judge_name(name):
-    re_dg = re.compile('^[a-zA-Z][a-zA-Z0-9_-]*$')
-    if re_dg.match(name):
-        return name
-
-
-def judge_size(size):
-    re_size = re.compile('^[1-9][0-9.]*([KkMmGgTtPpB](iB|B)?)$')
-    if re_size.match(size):
-        return size
-
-
-def judge_num(num):
-    re_num = re.compile('^[1-9][0-9]*')
-    if re_num.match(num):
-        return num
-
-
-
 def judge_cmd_result_suc(cmd):
     re_suc = re.compile('SUCCESS')
     if re_suc.search(cmd):

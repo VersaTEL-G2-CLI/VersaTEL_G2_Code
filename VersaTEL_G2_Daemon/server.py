@@ -13,7 +13,6 @@ def get_host_ip():
     return ip
 
 host_port = 12144
-# host_ip = "192.168.36.61"
 host_ip = get_host_ip()
 byteData = b'null'
 
@@ -40,12 +39,6 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                 sql_script = self.request.recv(8192)
                 byteData = sql_script
                 self.request.send(b'over')
-
-                # #接收记录时间的字典
-                # cli_reve_time = self.request.recv(8192).decode()
-                # for i,j in eval(cli_reve_time).items():
-                #     print(i,j)
-                # self.request.send(b'ok')
             else:
                 pass
 
