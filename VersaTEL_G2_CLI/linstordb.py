@@ -210,6 +210,7 @@ class LINSTORDB():
                                      stderr=subprocess.STDOUT)
         output_sp = result_sp.stdout.read().decode('utf-8')
         sp = gi.GetLinstor(output_sp)
+        #self.insert_data(self.replace_stb_sql, sp.get_data())
         self.rep_storagepooltb(sp.get_data())
 
 
@@ -237,42 +238,36 @@ class LINSTORDB():
         self.con.commit()
 
 
+    def insert_data(self,sql,list_data):
+        for i in range(len(list_data)):
+            list_data[i].insert(0,i+1)
+            self.cur.execute(sql,list_data[i])
 
 
     def rep_storagepooltb(self,list_data):
-        list_id = range(len(list_data))
-        for i, data in zip(list_id, list_data):
-            id = i+1
-            stp, node, dri, pooln, freecap, totalcap, Snap, state = data
-            self.cur.execute(self.replace_stb_sql, (id, stp, node, dri, pooln, freecap, totalcap, Snap, state))
+        for i in range(len(list_data)):
+            list_data[i].insert(0,i+1)
+            self.cur.execute(self.replace_stb_sql, list_data[i])
 
     def rep_resourcetb(self,list_data):
-        list_id = range(len(list_data))
-        for i, data in zip(list_id,list_data):
-            id = i+1
-            node, res, stp, voln, minorn, devname, allocated, use, state = data
-            self.cur.execute(self.replace_rtb_sql, (id, node, res, stp, voln, minorn, devname, allocated, use, state))
+        for i in range(len(list_data)):
+            list_data[i].insert(0,i+1)
+            self.cur.execute(self.replace_rtb_sql, list_data[i])
 
     def rep_nodetb(self,list_data):
-        list_id = range(len(list_data))
-        for i, data in zip(list_id,list_data):
-            id = i+1
-            node, nodetype, addr, state = data
-            self.cur.execute(self.replace_ntb_sql, (id, node, nodetype, addr, state))
+        for i in range(len(list_data)):
+            list_data[i].insert(0,i+1)
+            self.cur.execute(self.replace_ntb_sql, list_data[i])
 
     def rep_vgtb(self,list_data):
-        list_id = range(len(list_data))
-        for i,data in zip(list_id,list_data):
-            id = i+1
-            VG,VSize,VFree = data
-            self.cur.execute(self.replace_vgtb_sql,(id,VG,VSize,VFree))
+        for i in range(len(list_data)):
+            list_data[i].insert(0,i+1)
+            self.cur.execute(self.replace_vgtb_sql,list_data[i])
 
     def rep_thinlvtb(self, list_data):
-        list_id = range(len(list_data))
-        for i, data in zip(list_id, list_data):
-            id = i + 1
-            LV,VG,LSize= data
-            self.cur.execute(self.replace_thinlvtb_sql, (id,LV,VG,LSize))
+        for i in range(len(list_data)):
+            list_data[i].insert(0,i+1)
+            self.cur.execute(self.replace_thinlvtb_sql, list_data[i])
 
     # def run_insert(self):
     #     # self.rep_storagepooltb()
@@ -421,9 +416,7 @@ class DataProcess():
     def process_data_node_specific(self,node):
         date_list = []
         for n in self._select_resourcetb(node):
-            res_name, stp_name, size, device_name, used, status = n
-            list_one = [res_name, stp_name, size, device_name, used, status]
-            date_list.append(list_one)
+            date_list.append(list(n))
         return date_list
 
     def process_data_resource_all(self):
@@ -431,9 +424,11 @@ class DataProcess():
         list_one = []
         for i in self._get_resource():
             if i[1]: #过滤size为空的resource
-                resource, size, device_name, used = i
+                # resource, size, device_name, used = i
                 mirror_way = self._get_mirro_way(str(i[0]))[0]
-                list_one = [resource,mirror_way,size,device_name,used]
+                list_one = list(i)
+                list_one.insert(1,mirror_way)
+                # list_one = [resource,mirror_way,size,device_name,used]
                 date_list.append(list_one)
         self.cur.close()
         return date_list

@@ -12,9 +12,13 @@ from crm_resouce import crm
 from getlinstor import GetLinstor
 from iscsi_json import JSON_OPERATION
 from cli_socketclient import SocketSend
+import regex
 
 #多节点创建resource时，storapoo多于node的异常类
 class NodeLessThanSPError(Exception):
+    pass
+
+class InvalidSize(Exception):
     pass
 
 
@@ -99,7 +103,7 @@ class CLI():
 
         self.resource_create.add_argument('resource', metavar='RESOURCE',action='store',help='Name of the resource')
         self.resource_create.add_argument('-s', dest='size', action='store',help=' Size of the resource.In addition to creating diskless resource, you must enter SIZE.'
-                                                                                 'Valid units: B, K, kB, KiB, M, MB,MiB, G, GB, GiB, T, TB, TiB, P, PB, PiB.')
+                                                                                 'Valid units: B, K, kB, KiB, M, MB,MiB, G, GB, GiB, T, TB, TiB, P, PB, PiB.\nThe default unit is GB.')
         self.resource_create.add_argument('-gui', dest='gui', action='store_true', help=argparse.SUPPRESS, default=False)
 
 
@@ -332,7 +336,6 @@ class CLI():
             #     if len(args.node) >= len(args.storagepool):
             #         return True
 
-
             """
             以下注释代码为创建resource判断分支的另一种写法
             把创建resource的三种模式：正常创建（包括自动和手动），创建diskless，添加mirror分别封装
@@ -342,6 +345,10 @@ class CLI():
             def is_args_correct():
                 if len(args.node) < len(args.storagepool):
                     raise NodeLessThanSPError('指定的storagepool数量应少于node数量')
+
+            def is_vail_size(size):
+                if not regex.judge_size(size):
+                    raise InvalidSize('Invalid Size')
 
             #特定模式必需的参数
             list_auto_required = [args.auto, args.num]
@@ -356,6 +363,14 @@ class CLI():
                     return
                 if any(list_normal_forbid):
                     return
+                try:
+                    is_vail_size(args.size)
+                except InvalidSize:
+                    print('%s is not a valid size!'%args.size)
+                    sys.exit(0)
+                else:
+                    pass
+
                 if all(list_auto_required) and not any(list_manual_required):
                     #For GUI
                     if args.gui:
@@ -678,8 +693,9 @@ class CLI():
 
     #gui端 get DB
     def getdb(self):
-        mes = SocketSend()
-        mes.send_result(mes.sql_script)#get sql_scipt
+        db = linstordb.LINSTORDB()
+        handle = SocketSend()
+        handle.send_result(db.data_base_dump)#get sql_scipt
 
     def stor_judge(self):
         args = self.args
