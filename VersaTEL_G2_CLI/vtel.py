@@ -6,7 +6,6 @@ import sys
 from stor_cmds import Action as stor_action
 import usage
 import linstordb
-
 import os
 from crm_resouce import crm
 from getlinstor import GetLinstor
@@ -785,8 +784,8 @@ class CLI():
     
     # host创建
     def judge_hc(self, args, js):
-        print("hostname:", args.iqnname)
-        print("host:", args.iqn)
+        print("Host name:", args.iqnname)
+        print("iqn:", args.iqn)
         if js.check_key('Host', args.iqnname):
             print("Fail! The Host " + args.iqnname + " already existed.")
             return False
@@ -845,8 +844,8 @@ class CLI():
 
     # hostgroup创建
     def judge_hgc(self, args, js):
-        print("hostgroupname:", args.hostgroupname)
-        print("iqn name:", args.iqnname)
+        print("Hostgroup name:", args.hostgroupname)
+        print("Host name:", args.iqnname)
         if js.check_key('HostGroup', args.hostgroupname):
             print("Fail! The HostGroup " + args.hostgroupname + " already existed.")
             return False
@@ -896,8 +895,8 @@ class CLI():
 
     # diskgroup创建
     def judge_dgc(self, args, js):
-        print("diskgroupname:", args.diskgroupname)
-        print("disk name:", args.diskname)
+        print("Diskgroup name:", args.diskgroupname)
+        print("Disk name:", args.diskname)
         if js.check_key('DiskGroup', args.diskgroupname):
             print("Fail! The DiskGroup " + args.diskgroupname + " already existed.")
             return False
@@ -947,9 +946,9 @@ class CLI():
 
     # map创建
     def judge_mc(self, args, js):
-        print("map name:", args.mapname)
-        print("hostgroup name:", args.hg)
-        print("diskgroup name:", args.dg)
+        print("Map name:", args.mapname)
+        print("Hostgroup name:", args.hg)
+        print("Diskgroup name:", args.dg)
         if js.check_key('Map', args.mapname):
             print("The Map \"" + args.mapname + "\" already existed.")
             return False
