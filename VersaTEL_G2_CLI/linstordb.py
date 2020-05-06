@@ -7,11 +7,7 @@ import sqlite3,socket,subprocess,datetime,threading
 import multiprocessing as mp
 import regex
 
-def nowtime():
-    time = datetime.datetime.now()
-    return time
-
-
+#11
 
 class LINSTORDB():
     #LINSTOR表
@@ -156,13 +152,20 @@ class LINSTORDB():
         thread_ins_res = threading.Thread(target=self.get_res())
         thread_ins_sp = threading.Thread(target=self.get_sp())
 
-        thread_ins_node.start()
-        thread_ins_res.start()
-        thread_ins_sp.start()
+        threads = [thread_ins_node,thread_ins_res,thread_ins_sp]
 
-        thread_ins_node.join()
-        thread_ins_res.join()
-        thread_ins_sp.join()
+        for i in range(len(threads)):
+            threads[i].start()
+        for i in range(len(threads)):
+            threads[i].join()
+
+        # thread_ins_node.start()
+        # thread_ins_res.start()
+        # thread_ins_sp.start()
+        #
+        # thread_ins_node.join()
+        # thread_ins_res.join()
+        # thread_ins_sp.join()
 
 
         #multiprocessing
