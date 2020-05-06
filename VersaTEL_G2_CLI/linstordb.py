@@ -148,11 +148,14 @@ class LINSTORDB():
 
     def get_output(self):
         #threading
-        thread_ins_node = threading.Thread(target=self.get_node())
-        thread_ins_res = threading.Thread(target=self.get_res())
-        thread_ins_sp = threading.Thread(target=self.get_sp())
+        threads = []
 
-        threads = [thread_ins_node,thread_ins_res,thread_ins_sp]
+        thread_ins_node = threading.Thread(target=self.get_node())
+        threads.append(thread_ins_node)
+        thread_ins_res = threading.Thread(target=self.get_res())
+        threads.append(thread_ins_res)
+        thread_ins_sp = threading.Thread(target=self.get_sp())
+        threads.append(thread_ins_sp)
 
         for i in range(len(threads)):
             threads[i].start()
@@ -185,36 +188,34 @@ class LINSTORDB():
         result_vg = subprocess.Popen('vgs',shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         output_vg = result_vg.stdout.read().decode()
         vg = regex.refining_vg(output_vg)
-        self.rep_vgtb(vg)
-
+        self.insert_data(self.replace_vgtb_sql,vg)
 
     def get_thinlv(self):
         result_thinlv = subprocess.Popen('lvs',shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         output_thinlv = result_thinlv.stdout.read().decode()
         thinlv = regex.refining_thinlv(output_thinlv)
-        self.rep_thinlvtb(thinlv)
+        self.insert_data(self.replace_thinlvtb_sql, thinlv)
 
     def get_node(self):
         result_node = subprocess.Popen('linstor --no-color --no-utf8 n l', shell=True, stdout=subprocess.PIPE,
                                        stderr=subprocess.STDOUT)
         output_node = result_node.stdout.read().decode('utf-8')
         node = gi.GetLinstor(output_node)
-        self.rep_nodetb(node.get_data())
+        self.insert_data(self.replace_ntb_sql,node.get_data())
 
     def get_res(self):
         result_res = subprocess.Popen('linstor --no-color --no-utf8 r lv', shell=True, stdout=subprocess.PIPE,
                                       stderr=subprocess.STDOUT)
         output_res = result_res.stdout.read().decode('utf-8')
         res = gi.GetLinstor(output_res)
-        self.rep_resourcetb(res.get_data())
+        self.insert_data(self.replace_rtb_sql,res.get_data())
 
     def get_sp(self):
         result_sp = subprocess.Popen('linstor --no-color --no-utf8 sp l', shell=True, stdout=subprocess.PIPE,
                                      stderr=subprocess.STDOUT)
         output_sp = result_sp.stdout.read().decode('utf-8')
         sp = gi.GetLinstor(output_sp)
-        #self.insert_data(self.replace_stb_sql, sp.get_data())
-        self.rep_storagepooltb(sp.get_data())
+        self.insert_data(self.replace_stb_sql, sp.get_data())
 
 
     #创建表
@@ -228,16 +229,22 @@ class LINSTORDB():
 
     #删除表，现不使用
     def drop_tb(self):
-        drp_storagepooltb_sql = "drop table if exists storagepooltb"#sql语句
-        drp_resourcetb_sql = "drop table if exists resourcetb"
-        drp_nodetb_sql = "drop table if exists nodetb"
-        drp_vgtb_sql = "drop table if exists vgtb"
-        drp_thinlvtb_sql = "drop table if exists thinlvtb"
-        self.cur.execute(drp_storagepooltb_sql)#检查是否存在表，如存在，则删除
-        self.cur.execute(drp_resourcetb_sql)
-        self.cur.execute(drp_nodetb_sql)
-        self.cur.execute(drp_vgtb_sql)
-        self.cur.execute(drp_thinlvtb_sql)
+        tables_sql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
+        self.cur.execute(tables_sql)
+        tables = self.cur.fetchall()
+        for table in tables:
+            drp_sql = "drop table if exists %s"%table
+            self.cur.execute(drp_sql)
+        # drp_storagepooltb_sql = "drop table if exists storagepooltb"#sql语句
+        # drp_resourcetb_sql = "drop table if exists resourcetb"
+        # drp_nodetb_sql = "drop table if exists nodetb"
+        # drp_vgtb_sql = "drop table if exists vgtb"
+        # drp_thinlvtb_sql = "drop table if exists thinlvtb"
+        # self.cur.execute(drp_storagepooltb_sql)#检查是否存在表，如存在，则删除
+        # self.cur.execute(drp_resourcetb_sql)
+        # self.cur.execute(drp_nodetb_sql)
+        # self.cur.execute(drp_vgtb_sql)
+        # self.cur.execute(drp_thinlvtb_sql)
         self.con.commit()
 
 
@@ -247,36 +254,6 @@ class LINSTORDB():
             self.cur.execute(sql,list_data[i])
 
 
-    def rep_storagepooltb(self,list_data):
-        for i in range(len(list_data)):
-            list_data[i].insert(0,i+1)
-            self.cur.execute(self.replace_stb_sql, list_data[i])
-
-    def rep_resourcetb(self,list_data):
-        for i in range(len(list_data)):
-            list_data[i].insert(0,i+1)
-            self.cur.execute(self.replace_rtb_sql, list_data[i])
-
-    def rep_nodetb(self,list_data):
-        for i in range(len(list_data)):
-            list_data[i].insert(0,i+1)
-            self.cur.execute(self.replace_ntb_sql, list_data[i])
-
-    def rep_vgtb(self,list_data):
-        for i in range(len(list_data)):
-            list_data[i].insert(0,i+1)
-            self.cur.execute(self.replace_vgtb_sql,list_data[i])
-
-    def rep_thinlvtb(self, list_data):
-        for i in range(len(list_data)):
-            list_data[i].insert(0,i+1)
-            self.cur.execute(self.replace_thinlvtb_sql, list_data[i])
-
-    # def run_insert(self):
-    #     # self.rep_storagepooltb()
-    #     # self.rep_resourcetb()
-    #     # self.rep_nodetb()
-    #     self.con.commit()
 
     def data_base_dump(self):
         cur = self.cur
