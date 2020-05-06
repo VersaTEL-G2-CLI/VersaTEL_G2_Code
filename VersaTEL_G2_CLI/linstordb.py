@@ -7,7 +7,6 @@ import sqlite3,socket,subprocess,datetime,threading
 import multiprocessing as mp
 import regex
 
-#11
 
 class LINSTORDB():
     #LINSTOR表
