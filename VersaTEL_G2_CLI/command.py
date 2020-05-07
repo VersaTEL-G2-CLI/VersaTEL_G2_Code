@@ -17,8 +17,8 @@ class InvalidSize(Exception):
 class CLI():
     def __init__(self):
         self.parser_vtel()
-        self.parser_stor()
-        self.parser_iscsi()
+        # self.parser_stor()
+        # self.parser_iscsi()
 
 
     def parser_vtel(self):

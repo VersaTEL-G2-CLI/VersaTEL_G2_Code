@@ -2,18 +2,15 @@
 
 import argparse
 import sys
-# import view
 from stor_cmds import Action as stor_action
-import usage
 import linstordb
-
-import os
 from crm_resouce import crm
-from getlinstor import GetLinstor
+import regex
 from iscsi_json import JSON_OPERATION
 from cli_socketclient import SocketSend
 import regex
 from command import CLI
+from view import OutputData
 
 
 # 多节点创建resource时，storapoo多于node的异常类
@@ -28,12 +25,13 @@ class InvalidSize(Exception):
 class CLIParse():
     def __init__(self):
         self.cmd = CLI()
-        # if sys.argv[1] == 'stor':
-        #     self.cmd.parser_stor()
-        # elif sys.argv[1] == 'iscsi':
-        #     self.cmd.parser_iscsi()
-        # else:
-        #     print('111')
+        try:
+            if sys.argv[1] == 'stor':
+                self.cmd.parser_stor()
+            elif sys.argv[1] == 'iscsi':
+                self.cmd.parser_iscsi()
+        except Exception as E:
+            pass
 
         self.vtel = self.cmd.vtel
         self.args = self.vtel.parse_args()
@@ -84,7 +82,7 @@ class CLIParse():
             _skip_confirm() if args.node else parser_delete.print_help()
 
         def node_show():
-            tb = linstordb.OutputData()
+            tb = OutputData()
             if args.nocolor:
                 tb.show_node_one(args.node) if args.node else tb.node_all()
             else:
@@ -345,7 +343,7 @@ class CLIParse():
             #     parser_delete.print_help()
 
         def resource_show():
-            tb = linstordb.OutputData()
+            tb = OutputData()
             if args.nocolor:
                 tb.show_res_one(args.resource) if args.resource else tb.res_all()
             else:
@@ -413,7 +411,7 @@ class CLIParse():
             _skip_confirm() if args.storagepool else parser_delete.print_help()
 
         def storagepool_show():
-            tb = linstordb.OutputData()
+            tb = OutputData()
             if args.nocolor:
                 tb.show_sp_one(args.storagepool) if args.storagepool else tb.sp_all()
             else:
@@ -612,9 +610,9 @@ class CLIParse():
         cd = crm()
         # data = cd.lsdata()
         data = cd.get_data_linstor()
-        linstorlv = GetLinstor(data)
+        linstorlv = regex.refine_linstor(data)
         disks = {}
-        for d in linstorlv.get_data():
+        for d in linstorlv:
             disks.update({d[1]: d[5]})
         js.up_data('Disk', disks)
         if args.show == 'all' or args.show == None:
@@ -825,7 +823,7 @@ class CLIParse():
         disk = js.get_data('DiskGroup').get(dg)
         cd = crm()
         data = cd.get_data_linstor()
-        linstorlv = GetLinstor(data)
+        linstorlv = regex.re
         print("get linstor r lv data")
         # print(linstorlv.get_data())
         diskd = {}
