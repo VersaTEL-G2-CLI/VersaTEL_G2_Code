@@ -715,10 +715,9 @@ class CLI():
                 self.vtel_stor.print_help()
 
 
-    """
+  """
     ------iscsi-------
     """
-
     # 命令判断
     def iscsi_judge(self):
         js = JSON_OPERATION()
@@ -727,7 +726,7 @@ class CLI():
             if args.host in ['create', 'c']:
                 if args.gui == 'gui':
                     handle = SocketSend()
-                    handle.send_result(self.judge_hc, args, js)
+                    handle.send_result(self.judge_hc,args,js)
                 else:
                     self.judge_hc(args, js)
             elif args.host in ['show', 's']:
@@ -792,11 +791,12 @@ class CLI():
         else:
             print("iscsi (choose from 'host', 'disk', 'hg', 'dg', 'map')")
             self.vtel_iscsi.print_help()
-            
+    
+    
     # host创建
     def judge_hc(self, args, js):
-        print("hostname:", args.iqnname)
-        print("host:", args.iqn)
+        print("Host name:", args.iqnname)
+        print("iqn:", args.iqn)
         if js.check_key('Host', args.iqnname):
             print("Fail! The Host " + args.iqnname + " already existed.")
             return False
@@ -855,8 +855,8 @@ class CLI():
 
     # hostgroup创建
     def judge_hgc(self, args, js):
-        print("hostgroupname:", args.hostgroupname)
-        print("iqn name:", args.iqnname)
+        print("Hostgroup name:", args.hostgroupname)
+        print("Host name:", args.iqnname)
         if js.check_key('HostGroup', args.hostgroupname):
             print("Fail! The HostGroup " + args.hostgroupname + " already existed.")
             return False
@@ -906,8 +906,8 @@ class CLI():
 
     # diskgroup创建
     def judge_dgc(self, args, js):
-        print("diskgroupname:", args.diskgroupname)
-        print("disk name:", args.diskname)
+        print("Diskgroup name:", args.diskgroupname)
+        print("Disk name:", args.diskname)
         if js.check_key('DiskGroup', args.diskgroupname):
             print("Fail! The DiskGroup " + args.diskgroupname + " already existed.")
             return False
@@ -957,9 +957,9 @@ class CLI():
 
     # map创建
     def judge_mc(self, args, js):
-        print("map name:", args.mapname)
-        print("hostgroup name:", args.hg)
-        print("diskgroup name:", args.dg)
+        print("Map name:", args.mapname)
+        print("Hostgroup name:", args.hg)
+        print("Diskgroup name:", args.dg)
         if js.check_key('Map', args.mapname):
             print("The Map \"" + args.mapname + "\" already existed.")
             return False
@@ -1106,7 +1106,6 @@ class CLI():
                 else:
                     return False
             return True
-
 
 if __name__ == '__main__':
     CLI()
